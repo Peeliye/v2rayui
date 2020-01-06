@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}登录{% endblock title %}
+
+{% block body %}
+    <body class="hold-transition login-page">
+    <div class="login-box">
+        <div class="login-logo">
+            <b>XX</b>net
+        </div>
+        <div class="card">
+            <div class="card-body login-card-body">
+                <p class="login-box-msg text-orange text-bold">{% if failed %}用户名或密码错误！{% endif %}</p>
+                <form action="{% url 'login' %}" method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div class="input-group mb-3">
+                        {{ form.username }}
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        {{ form.password }}
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary btn-block">登录</button>
+                    </div>
+                </form>
+                <div class="social-auth-links text-center mb-3">
+                    <p>- 或 -</p>
+                    <a href="{% url 'register' %}" class="btn btn-block btn-danger">注册新用户</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </body>
+{% endblock body %}

@@ -1,0 +1,28 @@
+{% load static %}<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}首页{% endblock title %} - XXnet</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+    {% block css %}
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="{% static 'css/fontawesome-free-all.min.css' %}">
+        <!-- Theme style -->
+        <link rel="stylesheet" href="{% static 'css/adminlte.min.css' %}">
+        <!-- Google Font: Source Sans Pro -->
+        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    {% endblock css %}
+    {% block js %}
+        <!-- jQuery -->
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <!-- AdminLTE App -->
+        <script src="{% static 'js/adminlte.min.js' %}"></script>
+    {% endblock js %}
+</head>
+{% block body %}
+    <body></body>
+{% endblock body %}
+</html>

@@ -1,0 +1,133 @@
+{% extends 'uibase.html' %}
+{% block title %}客户端下载{% endblock title %}
+
+{% load static %}
+
+{% block content %}
+    <section class="content pt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6 p-4">
+                    <div class="position-relative p-3 bg-gradient-navy" style="height: 180px">
+                        <div class="ribbon-wrapper ribbon-lg">
+                            <div class="ribbon bg-success text-lg" style="text-transform:none">
+                                Windows
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <div class="mb-3">
+                                Windows客户端：{{ clients.windows.client_name }}
+                            </div>
+                            <div class="mb-3">
+                                版本：{{ clients.windows.version }}
+                            </div>
+                            <div class="text-center">
+                                <a href="{% static 'clients/' %}{{ clients.windows.file_name }}" class="btn btn-block btn-primary">下载</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 p-4">
+                    <div class="position-relative p-3 bg-gradient-gray-dark" style="height: 180px">
+                        <div class="ribbon-wrapper ribbon-lg">
+                            <div class="ribbon bg-success text-lg" style="text-transform:none">
+                                Android
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <div class="mb-3">
+                                Android客户端：{{ clients.android.client_name }}
+                            </div>
+                            <div class="mb-3">
+                                版本：{{ clients.android.version }}
+                            </div>
+                            <div class="text-center">
+                                <a href="{% static 'clients/' %}{{ clients.android.file_name }}" class="btn btn-block btn-primary">下载</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 p-4">
+                    <div class="position-relative p-3 bg-gradient-gray" style="height: 180px">
+                        <div class="ribbon-wrapper ribbon-lg">
+                            <div class="ribbon bg-success text-lg" style="text-transform:none">
+                                MacOS
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <div class="mb-3">
+                                MacOS客户端：{{ clients.macos.client_name }}
+                            </div>
+                            <div class="mb-3">
+                                版本：{{ clients.macos.version }}
+                            </div>
+                            <div class="text-center">
+                                <a href="{% static 'clients/' %}{{ clients.macos.file_name }}" class="btn btn-block btn-primary">下载</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 p-4">
+                    <div class="position-relative p-3 bg-gradient-olive" style="height: 180px">
+                        <div class="ribbon-wrapper ribbon-lg">
+                            <div class="ribbon bg-success text-lg" style="text-transform:none">
+                                iOS
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <div class="mb-3">
+                                iOS客户端：{{ clients.ios.client_name }}
+                            </div>
+                            <div class="mb-3">
+                                说明：请登录AppStore下载
+                            </div>
+                            <div class="text-center">
+                                <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#apple-id-info-modal">
+                                    查看账号
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal fade" id="apple-id-info-modal" tabindex="-1" role="dialog" aria-labelledby="apple-id-info-modal-title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="apple-id-info-modal">iOS Apple ID信息</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-danger mt-2 mb-4">
+                        <b>注意：</b>严禁修改Apple ID的密码！请下载完App后及时退出账号。
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <span class="">账号:</span>
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" readonly value="{{ clients.ios.apple_id }}">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <span class="">密码:</span>
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" readonly value="{{ clients.ios.apple_id_pwd }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

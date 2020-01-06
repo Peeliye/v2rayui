@@ -1,0 +1,231 @@
+{% extends 'uibase.html' %}
+{% block title %}服务器节点管理{% endblock title %}
+
+{% load v2rayui_filter %}{% load static %}
+
+{% block content %}
+    <section class="content pt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">服务器节点列表</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#add-new-node-modal">
+                                    <i class="fas fa-plus"></i> 添加服务器
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="server-node-accordion">
+                                {% for node in nodes %}
+                                    <div class="card card-{% if node.enable %}success{% else %}info{% endif %}">
+                                        <div class="card-header">
+                                            <h4 class="card-title">
+                                                <a data-toggle="collapse" data-parent="#server-node-accordion" href="#server-node-info-{{ forloop.counter }}" class="collapsed" aria-expanded="false">
+                                                    {{ forloop.counter }}. {{ node.name }}
+                                                </a>
+                                            </h4>
+                                        </div>
+                                        <div id="server-node-info-{{ forloop.counter }}" class="panel-collapse in collapse show">
+                                            <div class="card-body">
+                                                <ul class="nav nav-pills flex-column">
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">节点名称: </b>{{ node.name }}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">节点ID: </b>{{ node.node_id }}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">备注: </b>{{ node.info }}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">节点地址: </b>{{ node.server }}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">节点端口: </b>{{ node.port }}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">节点状态: </b>
+                                                            {% if node.enable %}
+                                                                <span class="badge bg-success">启用</span>
+                                                            {% else %}
+                                                                <span class="badge bg-info">禁用</span>
+                                                            {% endif %}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">协议: </b>{{ node.protocol }}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">路径: </b>{{ node.path }}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">入口标签: </b>{{ node.inbound_tag }}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">GRPC地址: </b>{{ node.grpc_host }}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">GRPC端口: </b>{{ node.grpc_port }}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">节点地区: </b>{{ node.country }}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">已用流量: </b>{{ node.used_traffic }}GB </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">总流量: </b>{{ node.total_traffic }}GB </p>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal fade" id="add-new-node-modal" tabindex="-1" role="dialog" aria-labelledby="add-new-node-modal-title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form action="{% url 'servernode' %}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="add-new-node-modal-title">添加新的服务器</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">节点名称</span>
+                                </div>
+                            </div>
+                            {{ form.node_name }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">节点地址</span>
+                                </div>
+                            </div>
+                            {{ form.server_addr }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">节点端口</span>
+                                </div>
+                            </div>
+                            {{ form.server_port }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">协议</span>
+                                </div>
+                            </div>
+                            {{ form.protocol }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">URL路径</span>
+                                </div>
+                            </div>
+                            {{ form.path }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">入口标签</span>
+                                </div>
+                            </div>
+                            {{ form.inbound_tag }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">是否启用</span>
+                                </div>
+                            </div>
+                            {{ form.is_enable }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">API通信地址</span>
+                                </div>
+                            </div>
+                            {{ form.grpc_host }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">API通信端口</span>
+                                </div>
+                            </div>
+                            {{ form.grpc_port }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">节点区域代码</span>
+                                </div>
+                            </div>
+                            {{ form.country }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">节点备注</span>
+                                </div>
+                            </div>
+                            {{ form.info }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info" data-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary">添加</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

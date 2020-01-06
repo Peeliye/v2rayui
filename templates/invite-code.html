@@ -1,0 +1,214 @@
+{% extends 'uibase.html' %}
+{% block title %}邀请码管理{% endblock title %}
+
+{% load v2rayui_filter %}{% load static %}
+
+{% block content %}
+    <section class="content pt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="callout callout-info">
+                        <h5><i class="fas fa-info"></i> 剩余邀请码数量: {{ request.user.invite_code_num }}</h5>
+                        如需更多邀请码，请联系管理员获取。
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">邀请码列表</h3>
+                            {% if request.user.invite_code_num > 0 %}
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#create-invite-code-modal">
+                                        <i class="fas fa-plus"></i> 创建邀请码
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <div id="invite-code-accordion">
+                                {% for code in invite_codes %}
+                                    <div class="card card-{% if code.is_used %}success{% elif code.expired_at|get_if_expired %}info{% else %}primary{% endif %}">
+                                        <div class="card-header">
+                                            <h4 class="card-title">
+                                                <a data-toggle="collapse" data-parent="#invite-code-accordion" href="#invite-code-info-{{ forloop.counter }}" class="collapsed" aria-expanded="false">
+                                                    {{ forloop.counter }}. {% if request.user.is_superuser %}{{ code.mark }}{% else %}{{ code.code }}{% endif %}
+                                                </a>
+                                            </h4>
+                                        </div>
+                                        <div id="invite-code-info-{{ forloop.counter }}" class="panel-collapse in collapse {% if forloop.counter == 1 %}show{% endif %}">
+                                            <div class="card-body">
+                                                <ul class="nav nav-pills flex-column">
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">邀请码: </b>{{ code.code }}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">备注: </b>{{ code.mark }}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">状态: </b>
+                                                            {% if code.is_used %}
+                                                                <span class="badge bg-success">已使用</span>
+                                                            {% elif code.expired_at|get_if_expired %}
+                                                                <span class="badge bg-info">已过期</span>
+                                                            {% else %}
+                                                                <span class="badge bg-primary">未使用</span>
+                                                            {% endif %}
+                                                        </p>
+                                                    </li>
+                                                    {% if request.user.is_superuser %}
+                                                        <li class="nav-item">
+                                                            <p class="text-muted mt-3 mb-3">
+                                                                <b class="text-sm mr-2">免费用户: </b>
+                                                                {% if code.is_free %} 是 {% else %} 否 {% endif %}
+                                                            </p>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <p class="text-muted mt-3 mb-3">
+                                                                <b class="text-sm mr-2">用户等级: </b>{{ code.user_level }}
+                                                            </p>
+                                                        </li>
+                                                    {% endif %}
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">创建时间: </b>{{ code.created_at|date:"Y-m-d H:i" }}
+                                                        </p>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <p class="text-muted mt-3 mb-3">
+                                                            <b class="text-sm mr-2">失效时间: </b>{{ code.expired_at|date:"Y-m-d H:i" }}
+                                                        </p>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if request.user.is_superuser %}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">网站用户邀请码列表</h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="user-invite-code-accordion">
+                                    {% for code in user_invite_codes %}
+                                        <div class="card card-{% if code.is_used %}success{% elif code.expired_at|get_if_expired %}info{% else %}primary{% endif %}">
+                                            <div class="card-header">
+                                                <h4 class="card-title">
+                                                    <a data-toggle="collapse" data-parent="#user-invite-code-accordion" href="#user-invite-code-info-{{ forloop.counter }}" class="collapsed" aria-expanded="false">
+                                                        {{ forloop.counter }}. {{ code.username }} - {{ code.code }}
+                                                    </a>
+                                                </h4>
+                                            </div>
+                                            <div id="user-invite-code-info-{{ forloop.counter }}" class="panel-collapse in collapse {% if forloop.counter == 1 %}show{% endif %}">
+                                                <div class="card-body">
+                                                    <ul class="nav nav-pills flex-column">
+                                                        <li class="nav-item">
+                                                            <p class="text-muted mt-3 mb-3">
+                                                                <b class="text-sm mr-2">邀请码: </b>{{ code.code }}
+                                                            </p>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <p class="text-muted mt-3 mb-3">
+                                                                <b class="text-sm mr-2">备注: </b>{{ code.mark }}
+                                                            </p>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <p class="text-muted mt-3 mb-3">
+                                                                <b class="text-sm mr-2">状态: </b>
+                                                                {% if code.is_used %}
+                                                                    <span class="badge bg-success">已使用</span>
+                                                                {% elif code.expired_at|get_if_expired %}
+                                                                    <span class="badge bg-info">已过期</span>
+                                                                {% else %}
+                                                                    <span class="badge bg-primary">未使用</span>
+                                                                {% endif %}
+                                                            </p>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <p class="text-muted mt-3 mb-3">
+                                                                <b class="text-sm mr-2">创建时间: </b>{{ code.created_at|date:"Y-m-d H:i" }}
+                                                            </p>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <p class="text-muted mt-3 mb-3">
+                                                                <b class="text-sm mr-2">失效时间: </b>{{ code.expired_at|date:"Y-m-d H:i" }}
+                                                            </p>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+    <!-- Modal -->
+    <div class="modal fade" id="create-invite-code-modal" tabindex="-1" role="dialog" aria-labelledby="create-invite-code-modal-title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form action="{% url 'invitecode' %}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="create-invite-code-modal-title">创建新的邀请码</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">备注</span>
+                                </div>
+                            </div>
+                            {{ form.invite_code_mark }}
+                        </div>
+                        {% if request.user.is_superuser %}
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <span class="">是否免费用户</span>
+                                    </div>
+                                </div>
+                                {{ form.is_free }}
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <span class="">用户等级</span>
+                                    </div>
+                                </div>
+                                {{ form.user_level }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info" data-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary">创建</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

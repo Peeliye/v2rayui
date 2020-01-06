@@ -1,0 +1,85 @@
+{% extends 'uibase.html' %}
+{% block title %}网站用户管理{% endblock title %}
+
+{% load v2rayui_filter %}{% load static %}
+
+{% block content %}
+    <section class="content pt-4">
+        <div class="container-fluid">
+            <div class="row mt-3">
+                {% for user in users %}
+                    <div class="col-12 col-sm-6 col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <ul class="nav nav-pills flex-column">
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">用户名: </b>{{ user.username }}
+                                        </p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">用户ID: </b>{{ user.user_id }}
+                                        </p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">用户等级: </b>{{ user.level }}
+                                        </p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">额外ID: </b>{{ user.alter_id }}
+                                        </p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">免费用户: </b>
+                                            {% if user.is_free %}
+                                                <span class="badge bg-success">是</span>
+                                            {% else %}
+                                                <span class="badge bg-info">否</span>
+                                            {% endif %}
+                                        </p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">已过期: </b>
+                                            {% if user.expire_at|get_if_expired %}
+                                                <span class="badge bg-danger">是</span>
+                                            {% else %}
+                                                <span class="badge bg-success">否</span>
+                                            {% endif %}
+                                        </p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">过期时间: </b>{{ user.expire_at|date:"Y-m-d" }}
+                                        </p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">邀请人: </b>{{ user.inviter_name }}
+                                        </p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">剩余邀请码: </b>{{ user.invite_code_num }}
+                                        </p>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <div class="text-right">
+                                    <button type="button" class="btn btn-sm btn-primary mr-2" data-toggle="modal" data-target="#user-edit-modal-{{ forloop.counter }}">
+                                        <i class="fas fa-link"></i> 设置
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock content %}

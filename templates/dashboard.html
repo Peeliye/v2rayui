@@ -1,0 +1,164 @@
+{% extends 'uibase.html' %}
+{% block title %}首页{% endblock title %}
+
+{% load v2rayui_filter %}
+{% load static %}
+
+{% block js %}
+    {{ block.super }}
+    <script src="{% static 'js/jquery.qrcode.min.js' %}"></script>
+{% endblock js %}
+
+{% block content %}
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-3 col-sm-6 col-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-info"><i class="fas fa-chart-pie"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">当月已用流量</span>
+                            <span class="info-box-number">0GB</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-success"><i class="fas fa-wifi"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">总流量</span>
+                            <span class="info-box-number">{% if request.user.total_traffic > 0 %}{{ request.user.total_traffic }}GB{% else %}
+                                不限制流量{% endif %}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-warning"><i class="far fa-calendar-alt"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">有效期至</span>
+                            <span class="info-box-number">{% if request.user.is_free %}无限期{% else %}
+                                {{ request.user.expire_at|date:"Y-m-d" }}{% endif %}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-danger"><i class="fas fa-hourglass-half"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">剩余日期</span>
+                            <span class="info-box-number">{% if request.user.is_free %}&sim;{% else %}
+                                {{ request.user.expire_at|get_expire_days }}{% endif %} 天</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                {% for node in nodes %}
+                    <div class="col-12 col-sm-6 col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-header text-muted">
+                                <b>{{ node.name }}</b>
+                            </div>
+                            <div class="card-body">
+                                <ul class="nav nav-pills flex-column">
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">主机: </b><span class="badge badge-success">{{ node.server }}</span></p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">端口: </b><span class="badge badge-success">{{ node.port }}</span></p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">用户ID: </b><span class="badge badge-success">{{ request.user.user_id }}</span></p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">额外ID: </b><span class="badge badge-success">{{ request.user.alter_id }}</span></p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">加密方式: </b><span class="badge badge-success">auto</span>
+                                        </p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3"><b class="text-sm mr-2">传输协议: </b><span class="badge badge-success">ws</span>
+                                        </p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3"><b class="text-sm mr-2">路径: </b><span class="badge badge-success">/abc</span>
+                                        </p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3"><b class="text-sm mr-2">TLS: </b><span class="badge badge-success">开启</span>
+                                        </p>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <div class="text-right">
+                                    <button type="button" class="btn btn-sm btn-primary mr-2" data-toggle="modal" data-target="#link-modal-{{ forloop.counter }}">
+                                        <i class="fas fa-link"></i> 账号链接
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#qrcode-modal-{{ forloop.counter }}">
+                                        <i class="fas fa-qrcode"></i> 二维码
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="link-modal-{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="link-modal-center-title-{{ forloop.counter }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="link-modal-center-title-{{ forloop.counter }}">账号链接</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <textarea class="form-control" rows="9" readonly>vmess://{{ node | get_vmss_base64:request }}</textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="qrcode-modal-{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="qrcode-modal-center-title-{{ forloop.counter }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="qrcode-modal-center-title-{{ forloop.counter }}">账号二维码</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div id="qrcode-picture-{{ forloop.counter }}" class="mx-auto d-block text-center"></div>
+                                    <script>
+                                        $('#qrcode-picture-{{ forloop.counter }}').qrcode({
+                                            width: 300,
+                                            height: 300,
+                                            text: "vmess://{{ node | get_vmss_base64:request }}"
+                                        });
+                                    </script>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock content %}

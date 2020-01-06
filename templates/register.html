@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}注册新用户{% endblock title %}
+
+{% block body %}
+    <body class="hold-transition register-page">
+    <div class="register-box">
+        <div class="register-logo">
+            <b>XX</b>net
+        </div>
+        <div class="card">
+            <div class="card-body register-card-body">
+                {% if failed %}
+                    <p class="login-box-msg text-orange text-bold">{{ reason }}</p>
+                {% else %}
+                    <p class="login-box-msg">注册新用户</p>
+                {% endif %}
+                <form action="{% url 'register' %}" method="post">
+                    {% csrf_token %}
+                    <div class="input-group mb-3">
+                        {{ form.invite_code }}
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-key"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        {{ form.username }}
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        {{ form.password }}
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary btn-block">注册</button>
+                    </div>
+                </form>
+
+                <div class="social-auth-links text-center">
+                    <p>- 或 -</p>
+                </div>
+                <a href="{% url 'login' %}" class="text-center">我已有账户，返回登录页</a>
+            </div>
+        </div>
+    </div>
+    </body>
+{% endblock body %}
