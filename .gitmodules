@@ -1,0 +1,3 @@
+[submodule "v2ray_api"]
+	path = v2ray_api
+	url = https://github.com/yunwei/v2ray_api.git
