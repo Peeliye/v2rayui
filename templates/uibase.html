@@ -25,32 +25,6 @@
             </ul>
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
-                {% if False %}
-                    <!-- Notifications Dropdown Menu
-                    <li class="nav-item dropdown">
-                        <a class="nav-link" data-toggle="dropdown" href="#">
-                            <i class="far fa-bell"></i>
-                            <span class="badge badge-warning navbar-badge">3</span>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                            <span class="dropdown-item dropdown-header">3条新公告</span>
-                            <div class="dropdown-divider"></div>
-                            <a href="#" class="dropdown-item text-primary">
-                                <i class="fas fa-caret-right mr-2 text-muted"></i><span>圣诞节优惠活动</span>
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a href="#" class="dropdown-item text-primary">
-                                <i class="fas fa-caret-right mr-2 text-muted"></i><span>12月20日凌晨进行服务器维护</span>
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a href="#" class="dropdown-item text-primary">
-                                <i class="fas fa-caret-right mr-2 text-muted"></i><span>新用户推荐优惠</span>
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a href="#" class="dropdown-item dropdown-footer">查看所有公告</a>
-                        </div>
-                    </li> -->
-                {% endif %}
                 <!-- User Dropdown Menu -->
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-toggle="dropdown" href="#">
@@ -127,12 +101,14 @@
                                 <p> 客户端下载 </p>
                             </a>
                         </li>
-                        <li class="nav-item user-panel">
-                            <a href="{% url 'invitecode' %}" class="nav-link {% if page == 'invite_code' %}active{% endif %}">
-                                <i class="nav-icon fas fa-paper-plane"></i>
-                                <p> 邀请码 </p>
-                            </a>
-                        </li>
+                        {% if ENABLE_USER_INVITATION or request.user.is_superuser %}
+                            <li class="nav-item user-panel">
+                                <a href="{% url 'invitecode' %}" class="nav-link {% if page == 'invite_code' %}active{% endif %}">
+                                    <i class="nav-icon fas fa-paper-plane"></i>
+                                    <p> 邀请码 </p>
+                                </a>
+                            </li>
+                        {% endif %}
                         {% if request.user.is_superuser %}
                             <li class="nav-item user-panel">
                                 <a href="{% url 'servernode' %}" class="nav-link {% if page == 'server_node' %}active{% endif %}">

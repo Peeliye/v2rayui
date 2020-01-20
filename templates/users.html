@@ -14,38 +14,50 @@
                                 <ul class="nav nav-pills flex-column">
                                     <li class="nav-item">
                                         <p class="text-muted mt-3 mb-3">
-                                            <b class="text-sm mr-2">用户名: </b>{{ user.username }}
+                                            <b class="text-sm mr-2">用户名: </b><span class="v2rayui-username">{{ user.username }}</span>
                                         </p>
                                     </li>
                                     <li class="nav-item">
                                         <p class="text-muted mt-3 mb-3">
-                                            <b class="text-sm mr-2">用户ID: </b>{{ user.user_id }}
+                                            <b class="text-sm mr-2">用户ID: </b><span class="v2rayui-user-id">{{ user.user_id }}</span>
                                         </p>
                                     </li>
                                     <li class="nav-item">
                                         <p class="text-muted mt-3 mb-3">
-                                            <b class="text-sm mr-2">用户等级: </b>{{ user.level }}
+                                            <b class="text-sm mr-2">当月已用流量: </b><span>{{ user.user_id|get_user_traffic:users_traffic }}GB</span>
                                         </p>
                                     </li>
                                     <li class="nav-item">
                                         <p class="text-muted mt-3 mb-3">
-                                            <b class="text-sm mr-2">额外ID: </b>{{ user.alter_id }}
+                                            <b class="text-sm mr-2">每月总流量: </b><span class="v2rayui-user-total-traffic">{{ user.total_traffic }}GB</span>
+                                        </p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">用户等级: </b><span class="v2rayui-user-level">{{ user.level }}</span>
+                                        </p>
+                                    </li>
+                                    <li class="nav-item">
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">额外ID: </b><span class="v2rayui-user-alter-id">{{ user.alter_id }}</span>
                                         </p>
                                     </li>
                                     <li class="nav-item">
                                         <p class="text-muted mt-3 mb-3">
                                             <b class="text-sm mr-2">免费用户: </b>
                                             {% if user.is_free %}
-                                                <span class="badge bg-success">是</span>
+                                                <span class="badge bg-success v2rayui-user-is-free">是</span>
                                             {% else %}
-                                                <span class="badge bg-info">否</span>
+                                                <span class="badge bg-info v2rayui-user-is-free">否</span>
                                             {% endif %}
                                         </p>
                                     </li>
                                     <li class="nav-item">
                                         <p class="text-muted mt-3 mb-3">
                                             <b class="text-sm mr-2">已过期: </b>
-                                            {% if user.expire_at|get_if_expired %}
+                                            {% if user.is_free %}
+                                                <span class="badge bg-success">否</span>
+                                            {% elif user.expire_at|get_if_expired %}
                                                 <span class="badge bg-danger">是</span>
                                             {% else %}
                                                 <span class="badge bg-success">否</span>
@@ -54,25 +66,25 @@
                                     </li>
                                     <li class="nav-item">
                                         <p class="text-muted mt-3 mb-3">
-                                            <b class="text-sm mr-2">过期时间: </b>{{ user.expire_at|date:"Y-m-d" }}
+                                            <b class="text-sm mr-2">过期时间: </b><span class="v2rayui-user-expire-at">{{ user.expire_at|date:"Y-m-d" }}</span>
                                         </p>
                                     </li>
                                     <li class="nav-item">
                                         <p class="text-muted mt-3 mb-3">
-                                            <b class="text-sm mr-2">邀请人: </b>{{ user.inviter_name }}
+                                            <b class="text-sm mr-2">邀请人: </b><span>{{ user.inviter_name }}</span>
                                         </p>
                                     </li>
                                     <li class="nav-item">
                                         <p class="text-muted mt-3 mb-3">
-                                            <b class="text-sm mr-2">剩余邀请码: </b>{{ user.invite_code_num }}
+                                            <b class="text-sm mr-2">剩余邀请码: </b><span class="v2rayui-user-invite-code-num">{{ user.invite_code_num }}</span>
                                         </p>
                                     </li>
                                 </ul>
                             </div>
                             <div class="card-footer">
                                 <div class="text-right">
-                                    <button type="button" class="btn btn-sm btn-primary mr-2" data-toggle="modal" data-target="#user-edit-modal-{{ forloop.counter }}">
-                                        <i class="fas fa-link"></i> 设置
+                                    <button type="button" class="btn btn-sm btn-primary v2rayui-user-edit-btn" data-toggle="modal" data-target="#user-edit-modal">
+                                        <i class="fas fa-pen"></i> 修改
                                     </button>
                                 </div>
                             </div>
@@ -82,4 +94,107 @@
             </div>
         </div>
     </section>
+
+    <!-- Modal -->
+    <div class="modal fade" id="user-edit-modal" tabindex="-1" role="dialog" aria-labelledby="user-edit-modal-title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form action="{% url 'users' %}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="user-edit-modal-title">修改用户</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+                        {{ form.user_id }}
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">过期日期</span>
+                                </div>
+                            </div>
+                            {{ form.expire_at }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">总流量</span>
+                                </div>
+                            </div>
+                            {{ form.total_traffic }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">邀请码数量</span>
+                                </div>
+                            </div>
+                            {{ form.invite_code_num }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">是否免费</span>
+                                </div>
+                            </div>
+                            {{ form.is_free }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">等级</span>
+                                </div>
+                            </div>
+                            {{ form.level }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">额外ID</span>
+                                </div>
+                            </div>
+                            {{ form.alter_id }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <span class="">用户密码</span>
+                                </div>
+                            </div>
+                            {{ form.password }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info" data-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary">修改</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(".v2rayui-user-edit-btn").click(function () {
+            var card_body = $(this).closest(".card").children(".card-body");
+            var user_name = card_body.find(".v2rayui-username").text();
+            var user_id = card_body.find(".v2rayui-user-id").text();
+            var user_level = card_body.find(".v2rayui-user-level").text();
+            var user_alter_id = card_body.find(".v2rayui-user-alter-id").text();
+            var user_is_free = card_body.find(".v2rayui-user-is-free").text();
+            var user_expire_at = card_body.find(".v2rayui-user-expire-at").text();
+            var user_invite_code_num = card_body.find(".v2rayui-user-invite-code-num").text();
+            var user_total_traffic = card_body.find(".v2rayui-user-total-traffic").text();
+            $("#id_user_id").attr("value", user_id);
+            $("#id_expire_at").attr("value", user_expire_at);
+            $("#id_total_traffic").attr("value", user_total_traffic);
+            $("#id_invite_code_num").attr("value", user_invite_code_num);
+            $("#id_is_free").val(user_is_free == "是" ? "True" : "False");
+            $("#id_level").attr("value", user_level);
+            $("#id_alter_id").attr("value", user_alter_id);
+            $("#user-edit-modal-title").text("修改用户：" + user_name);
+        });
+    </script>
 {% endblock content %}

@@ -13,6 +13,10 @@ import string
 import uuid
 
 
+def global_settings(request):
+    return {"ENABLE_USER_INVITATION": settings.ENABLE_USER_INVITATION}
+
+
 def get_random_code():
     max_count = 10
     while max_count > 0:
@@ -90,7 +94,7 @@ def register(request):
                                                 password=form.cleaned_data["password"],
                                                 level=invite_code.user_level,
                                                 is_free=invite_code.is_free,
-                                                expire_at=timezone.now() + datetime.timedelta(days=5),
+                                                expire_at=invite_code.user_expired_at,
                                                 inviter_name=invite_code.username)
             invite_code.is_used = True
             invite_code.save()
@@ -112,7 +116,12 @@ def dashboard(request):
         nodes = Node.objects.filter(enable=True)
     except Node.DoesNotExist:
         nodes = []
-    return render(request, "dashboard.html", {"page": "dashboard", "nodes": nodes})
+    try:
+        traffic_obj, is_created = UserTraffic.objects.get_or_create(user_id=request.user.user_id, year_month=timezone.now().strftime('%Y-%m'))
+        traffic = round(((traffic_obj.upload_traffic + traffic_obj.download_traffic) / 1024 / 1024 / 1024), 2)
+    except Exception:
+        traffic = 0
+    return render(request, "dashboard.html", {"page": "dashboard", "nodes": nodes, "traffic": traffic})
 
 
 def tutorial(request, system):
@@ -120,13 +129,13 @@ def tutorial(request, system):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
     if system.lower() == "android":
-        return render(request, "tutorial-android.html", {"page": "android"})
+        return render(request, "tutorial-android.html", {"page": "android", "clients": settings.CLIENTS})
     elif system.lower() == 'ios':
-        return render(request, "tutorial-ios.html", {"page": "ios"})
+        return render(request, "tutorial-ios.html", {"page": "ios", "clients": settings.CLIENTS})
     elif system.lower() == "windows":
-        return render(request, "tutorial-windows.html", {"page": "windows"})
+        return render(request, "tutorial-windows.html", {"page": "windows", "clients": settings.CLIENTS})
     elif system.lower() == "macos":
-        return render(request, "tutorial-macos.html", {"page": "macos"})
+        return render(request, "tutorial-macos.html", {"page": "macos", "clients": settings.CLIENTS})
     else:
         return HttpResponseNotFound()
 
@@ -142,6 +151,9 @@ def invite_code(request):
     """邀请码管理页面"""
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
+    if not settings.ENABLE_USER_INVITATION:
+        if not request.user.is_superuser:
+            return HttpResponseRedirect(reverse("dashboard"))
     if request.method == 'POST':
         form_data = InviteCodeForm(request.POST)
         if form_data.is_valid():
@@ -151,11 +163,14 @@ def invite_code(request):
                                           username=request.user.username,
                                           is_free=True if form_data.cleaned_data["is_free"] == 'True' else False,
                                           user_level=int(form_data.cleaned_data["user_level"]),
+                                          user_expired_at=form_data.cleaned_data["user_expired_at"] if form_data.cleaned_data.get(
+                                              "user_expired_at") else timezone.now() + datetime.timedelta(days=settings.DEFAULT_USER_EXPIRE_DAYS),
                                           expired_at=timezone.now() + datetime.timedelta(days=settings.INVITE_CODE_EXPIRE_DAYS))
             elif request.user.invite_code_num > 0:
                 InviteCode.objects.create(code=get_random_code(),
                                           mark=form_data.cleaned_data["invite_code_mark"],
                                           username=request.user.username,
+                                          user_expired_at=timezone.now() + datetime.timedelta(days=settings.DEFAULT_USER_EXPIRE_DAYS),
                                           expired_at=timezone.now() + datetime.timedelta(days=settings.INVITE_CODE_EXPIRE_DAYS))
                 request.user.invite_code_num -= 1
                 request.user.save()

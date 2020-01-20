@@ -43,7 +43,7 @@
                                                     </li>
                                                     <li class="nav-item">
                                                         <p class="text-muted mt-3 mb-3">
-                                                            <b class="text-sm mr-2">备注: </b>{{ node.info }}
+                                                            <b class="text-sm mr-2">节点API Key: </b>{{ node.api_key }}
                                                         </p>
                                                     </li>
                                                     <li class="nav-item">
@@ -78,17 +78,7 @@
                                                     </li>
                                                     <li class="nav-item">
                                                         <p class="text-muted mt-3 mb-3">
-                                                            <b class="text-sm mr-2">入口标签: </b>{{ node.inbound_tag }}
-                                                        </p>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <p class="text-muted mt-3 mb-3">
-                                                            <b class="text-sm mr-2">GRPC地址: </b>{{ node.grpc_host }}
-                                                        </p>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <p class="text-muted mt-3 mb-3">
-                                                            <b class="text-sm mr-2">GRPC端口: </b>{{ node.grpc_port }}
+                                                            <b class="text-sm mr-2">备注: </b>{{ node.comment }}
                                                         </p>
                                                     </li>
                                                     <li class="nav-item">
@@ -98,7 +88,8 @@
                                                     </li>
                                                     <li class="nav-item">
                                                         <p class="text-muted mt-3 mb-3">
-                                                            <b class="text-sm mr-2">已用流量: </b>{{ node.used_traffic }}GB </p>
+                                                            <b class="text-sm mr-2">当月已用流量: </b> {{ node.node_id|get_node_traffic:nodes_traffic }} GB
+                                                        </p>
                                                     </li>
                                                     <li class="nav-item">
                                                         <p class="text-muted mt-3 mb-3">
@@ -174,34 +165,10 @@
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <div class="input-group-text">
-                                    <span class="">入口标签</span>
-                                </div>
-                            </div>
-                            {{ form.inbound_tag }}
-                        </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text">
                                     <span class="">是否启用</span>
                                 </div>
                             </div>
                             {{ form.is_enable }}
-                        </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text">
-                                    <span class="">API通信地址</span>
-                                </div>
-                            </div>
-                            {{ form.grpc_host }}
-                        </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text">
-                                    <span class="">API通信端口</span>
-                                </div>
-                            </div>
-                            {{ form.grpc_port }}
                         </div>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
@@ -214,10 +181,18 @@
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <div class="input-group-text">
+                                    <span class="">节点总可用流量(GB)</span>
+                                </div>
+                            </div>
+                            {{ form.total_traffic }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
                                     <span class="">节点备注</span>
                                 </div>
                             </div>
-                            {{ form.info }}
+                            {{ form.comment }}
                         </div>
                     </div>
                     <div class="modal-footer">

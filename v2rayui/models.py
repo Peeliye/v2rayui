@@ -27,7 +27,7 @@ class UserTraffic(models.Model):
     """
     用户流量
     """
-    user_id = models.UUIDField(verbose_name="用户UUID", primary_key=True, editable=False)
+    user_id = models.UUIDField(verbose_name="用户UUID", primary_key=True)
     year_month = models.CharField(verbose_name="年月记录", max_length=64, db_index=True)
     upload_traffic = models.BigIntegerField("上传流量", default=0)
     download_traffic = models.BigIntegerField("下载流量", default=0)
@@ -47,6 +47,7 @@ class InviteCode(models.Model):
     is_free = models.BooleanField(verbose_name="是否是免费账号", default=False)
     user_level = models.PositiveIntegerField(verbose_name="新用户等级", default=settings.DEFAULT_LEVEL,
                                              validators=[MinValueValidator(0), MaxValueValidator(64)])
+    user_expired_at = models.DateTimeField(verbose_name="新账号过期时间")
     created_at = models.DateTimeField(verbose_name="创建时间", default=timezone.now)
     expired_at = models.DateTimeField(verbose_name="过期时间", db_index=True, default=timezone.now)
 
@@ -56,20 +57,30 @@ class InviteCode(models.Model):
 
 class Node(models.Model):
     node_id = models.UUIDField(verbose_name="节点UUID", primary_key=True, unique=True, default=uuid.uuid4, editable=False)
+    api_key = models.CharField("节点通信的Key", max_length=128, db_index=True)
     name = models.CharField("节点名称", max_length=32)
     server = models.CharField("服务器地址", max_length=128)
     port = models.IntegerField("端口", default=443)
     protocol = models.CharField("协议", default="ws", max_length=32, choices=[('ws', 'ws'), ('http', 'http')])
     path = models.CharField("ws或http2路径", max_length=128)
-    inbound_tag = models.CharField("标签", default="proxy", max_length=64)
-    grpc_host = models.CharField("Grpc地址", max_length=64, default="127.0.0.1")
-    grpc_port = models.CharField("Grpc端口", max_length=64, default="8080")
-    info = models.CharField("节点说明", max_length=512)
-    country = models.CharField("国家", default="US", max_length=8)
-    used_traffic = models.BigIntegerField("已用流量", default=0)
+    comment = models.CharField("节点说明", max_length=512)
+    country = models.CharField("国家", max_length=8)
     total_traffic = models.BigIntegerField("总流量", default=0)
     enable = models.BooleanField("是否开启", default=True)
     created_at = models.DateTimeField(verbose_name="创建时间", default=timezone.now)
 
     class Meta:
         verbose_name_plural = "服务器节点"
+
+
+class NodeTraffic(models.Model):
+    """
+    节点流量
+    """
+    node_id = models.UUIDField(verbose_name="节点UUID", primary_key=True)
+    year_month = models.CharField(verbose_name="年月记录", max_length=64, db_index=True)
+    upload_traffic = models.BigIntegerField("上传流量", default=0)
+    download_traffic = models.BigIntegerField("下载流量", default=0)
+
+    class Meta:
+        verbose_name_plural = "节点流量"

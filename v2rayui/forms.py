@@ -50,6 +50,8 @@ class InviteCodeForm(forms.Form):
                                 )
     user_level = forms.IntegerField(required=False,
                                     widget=forms.NumberInput(attrs={"class": "form-control", "value": settings.DEFAULT_LEVEL}))
+    user_expired_at = forms.DateTimeField(required=False,
+                                          widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "日期格式：2020-01-01"}))
 
 
 class ServerNodeForm(forms.Form):
@@ -68,20 +70,38 @@ class ServerNodeForm(forms.Form):
     path = forms.CharField(required=True,
                            widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "URL路径"})
                            )
-    inbound_tag = forms.CharField(required=True,
-                                  widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "v2ray入口标签"})
-                                  )
     is_enable = forms.ChoiceField(required=True,
                                   choices=((True, "Yes"), (False, "No")),
                                   widget=forms.Select(attrs={"class": "custom-select"})
                                   )
-    grpc_host = forms.CharField(required=False,
-                                widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "2ray API通信地址", "value": "127.0.0.1"})
-                                )
-    grpc_port = forms.IntegerField(required=False, widget=forms.NumberInput(attrs={"class": "form-control", "value": 8080}))
     country = forms.CharField(required=False,
                               widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "节点的区域代码"})
                               )
-    info = forms.CharField(required=False,
-                           widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "节点备注"})
-                           )
+    total_traffic = forms.IntegerField(required=False,
+                                       widget=forms.NumberInput(attrs={"class": "form-control"}))
+    comment = forms.CharField(required=False,
+                              widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "节点备注"})
+                              )
+
+
+class UserEditForm(forms.Form):
+    user_id = forms.CharField(required=True,
+                              widget=forms.HiddenInput()
+                              )
+    expire_at = forms.DateTimeField(required=False,
+                                    widget=forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "日期格式：2020-01-01"}))
+    total_traffic = forms.IntegerField(required=False,
+                                       widget=forms.NumberInput(attrs={"class": "form-control"}))
+    invite_code_num = forms.IntegerField(required=False,
+                                         widget=forms.NumberInput(attrs={"class": "form-control"}))
+    is_free = forms.ChoiceField(required=False,
+                                choices=((False, "No"), (True, "Yes")),
+                                widget=forms.Select(attrs={"class": "custom-select"})
+                                )
+    level = forms.IntegerField(required=False,
+                               widget=forms.NumberInput(attrs={"class": "form-control"}))
+    alter_id = forms.IntegerField(required=False,
+                                  widget=forms.NumberInput(attrs={"class": "form-control"}))
+    password = forms.CharField(required=False,
+                               widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "请输入新密码, 不更改时请留空"})
+                               )

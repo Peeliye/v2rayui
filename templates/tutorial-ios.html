@@ -4,5 +4,40 @@
 {% load static %}
 
 {% block content %}
+    <section class="content p-3 pt-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">iOS客户端使用教程</h3>
+            </div>
+            <div class="card-body">
+                <div class="border-bottom mb-2 pb-2">
+                    <p>
+                        第<b>1</b>步：通过AppStore安装 {{ clients.ios.client_name }} APP，公共AppleID如下（注意：请仅登录AppStore，不要登录iCloud，以免你的照片被自动上传）： </p>
+                    <p>
+                        <span>AppleID账号：</span><span class="text-muted">{{ clients.ios.apple_id }}</span>
 
+                    </p>
+                    <p>
+                        <span>AppleID密码：</span><span class="text-muted">{{ clients.ios.apple_id_pwd }}</span>
+                    </p>
+                </div>
+                <div class="border-bottom mt-2 pt-2 mb-2 pb-2">
+                    <p>
+                        第<b>2</b>步：教程中使用到的配置文件URL：
+                    </p>
+                    <p class="text-muted">https://raw.githubusercontent.com/h2y/Shadowrocket-ADBlock-Rules/master/sr_top500_banlist.conf</p>
+                </div>
+                <div class="mt-2 pt-2 mb-2 pb-2">
+                    <p>
+                        第<b>3</b>步：根据教程视频配置{{ clients.ios.client_name }}客户端并导入服务器信息： </p>
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <video controls>
+                            <source src="{% static 'videos/ios-tutorial.mp4' %}" type="video/mp4">
+                            您的浏览器不支持播放教程视频，请更换浏览器试试。
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock content %}

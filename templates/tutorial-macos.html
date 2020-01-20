@@ -4,5 +4,31 @@
 {% load static %}
 
 {% block content %}
-
+    <section class="content p-3 pt-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">MacOS客户端使用教程</h3>
+            </div>
+            <div class="card-body">
+                <div class="border-bottom mb-2 pb-2">
+                    <p>
+                        第<b>1</b>步：下载{{ clients.macos.client_name }}客户端
+                        <br>
+                        <a href="{% static 'clients/' %}{{ clients.macos.file_name }}" class="btn bg-primary btn-sm mt-3">
+                            下载 {{ clients.macos.client_name }} {{ clients.macos.version }}</a>
+                    </p>
+                </div>
+                <div class="mt-2 pt-2 mb-2 pb-2">
+                    <p>
+                        第<b>2</b>步：根据教程视频安装和配置{{ clients.macos.client_name }}客户端并导入服务器信息： </p>
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <video controls>
+                            <source src="{% static 'videos/macos-tutorial.mp4' %}" type="video/mp4">
+                            您的浏览器不支持播放教程视频，请更换浏览器试试。
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock content %}

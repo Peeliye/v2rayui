@@ -4,30 +4,43 @@
 {% load static %}
 
 {% block content %}
-    <section class="content">
-
-        <!-- Default box -->
+    <section class="content p-3 pt-4">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Title</h3>
-
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-                        <i class="fas fa-minus"></i></button>
-                    <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove">
-                        <i class="fas fa-times"></i></button>
-                </div>
+                <h3 class="card-title">Android客户端使用教程</h3>
             </div>
             <div class="card-body">
-                Start creating your amazing application!
+                <div class="border-bottom mb-2 pb-2">
+                    <p>
+                        第<b>1</b>步：下载和安装{{ clients.android.client_name }}客户端
+                        <br>
+                        <a href="{% static 'clients/' %}{{ clients.android.file_name }}" class="btn bg-primary btn-sm mt-3">
+                            下载 {{ clients.android.client_name }} {{ clients.android.version }}</a>
+                    </p>
+                </div>
+                <div class="border-bottom mt-2 pt-2 mb-2 pb-3">
+                    <p>
+                        第<b>2</b>步：教程中使用到的二维码（在手机上观看教程时可以先保存这两个二维码到系统相册）： </p>
+                    <img src="{% static 'images/qrcode-proxy-site.png' %}" class="img-thumbnail">
+                    <img src="{% static 'images/qrcode-direct-site.png' %}" class="img-thumbnail">
+                </div>
+                <div class="border-bottom mt-2 pt-2 mb-2 pb-2">
+                    <p>
+                        第<b>3</b>步：根据教程视频配置{{ clients.android.client_name }}客户端并导入服务器信息： </p>
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <video controls>
+                            <source src="{% static 'videos/android-tutorial.mp4' %}" type="video/mp4">
+                            您的浏览器不支持播放教程视频，请更换浏览器试试。
+                        </video>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 mb-2 pb-3">
+                    <p>
+                        <b>额外设置</b>：在可以正常上网之后，如果出现有些网站(APP)能访问，但某些网站(APP)不能访问或访问很慢；一般是你手机所连接网络的DNS屏蔽了一些域名的解析。可以通过启用v2rayNG的“本地DNS”功能来解决；（注：正常情况下无需启用这个选项）。启用方法是：进入到v2rayNG APP的设置界面 -> 进阶设置 -> 启用本地DNS -> 勾选：
+                    </p>
+                    <img src="{% static 'images/android-dns.png' %}" class="img-thumbnail">
+                </div>
             </div>
-            <!-- /.card-body -->
-            <div class="card-footer">
-                Footer
-            </div>
-            <!-- /.card-footer-->
         </div>
-        <!-- /.card -->
-
     </section>
 {% endblock content %}

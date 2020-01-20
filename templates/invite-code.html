@@ -6,14 +6,16 @@
 {% block content %}
     <section class="content pt-4">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <div class="callout callout-info">
-                        <h5><i class="fas fa-info"></i> 剩余邀请码数量: {{ request.user.invite_code_num }}</h5>
-                        如需更多邀请码，请联系管理员获取。
+            {% if not request.user.is_superuser %}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="callout callout-info">
+                            <h5><i class="fas fa-info"></i> 剩余邀请码数量: {{ request.user.invite_code_num }}</h5>
+                            如需更多邀请码，请联系管理员获取。
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
             <div class="row">
                 <div class="col-12">
                     <div class="card">
@@ -34,9 +36,22 @@
                                         <div class="card-header">
                                             <h4 class="card-title">
                                                 <a data-toggle="collapse" data-parent="#invite-code-accordion" href="#invite-code-info-{{ forloop.counter }}" class="collapsed" aria-expanded="false">
-                                                    {{ forloop.counter }}. {% if request.user.is_superuser %}{{ code.mark }}{% else %}{{ code.code }}{% endif %}
+                                                    {{ forloop.counter }}.
+                                                    {% if request.user.is_superuser %}{{ code.mark }}{% else %}{{ code.code }}{% endif %}
                                                 </a>
                                             </h4>
+                                            {% if request.user.is_superuser %}
+                                                <div class="card-tools">
+                                                    {% if not code.is_used and code.expired_at|get_if_expired %}
+                                                        <button type="button" class="btn btn-sm btn-warning mr-2" data-toggle="modal" data-target="#confirm-invite-code-modal" data-code="{{ code.code }}" data-action="reopen" data-href="{% url 'reopen_invite_code' invite_code=code.code %}">
+                                                            <i class="fas fa-redo" data-toggle="tooltip" data-placement="top" title="重新启用邀请码"></i>
+                                                        </button>
+                                                    {% endif %}
+                                                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirm-invite-code-modal" data-code="{{ code.code }}" data-action="delete" data-href="{% url 'delete_invite_code' invite_code=code.code %}">
+                                                        <i class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="删除邀请码"></i>
+                                                    </button>
+                                                </div>
+                                            {% endif %}
                                         </div>
                                         <div id="invite-code-info-{{ forloop.counter }}" class="panel-collapse in collapse {% if forloop.counter == 1 %}show{% endif %}">
                                             <div class="card-body">
@@ -73,6 +88,11 @@
                                                         <li class="nav-item">
                                                             <p class="text-muted mt-3 mb-3">
                                                                 <b class="text-sm mr-2">用户等级: </b>{{ code.user_level }}
+                                                            </p>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <p class="text-muted mt-3 mb-3">
+                                                                <b class="text-sm mr-2">新用户过期时间: </b>{{ code.user_expired_at|date:"Y-m-d H:i" }}
                                                             </p>
                                                         </li>
                                                     {% endif %}
@@ -201,6 +221,14 @@
                                 </div>
                                 {{ form.user_level }}
                             </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <span class="">新用户过期时间</span>
+                                    </div>
+                                </div>
+                                {{ form.user_expired_at }}
+                            </div>
                         {% endif %}
                     </div>
                     <div class="modal-footer">
@@ -211,4 +239,38 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="confirm-invite-code-modal" tabindex="-1" role="dialog" aria-labelledby="confirm-invite-code-modal-content" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body text-center pt-5 pb-4" id="confirm-invite-code-modal-content">
+                    123
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">取消</button>
+                    <a href="#" id="confirm-invite-btn" class="btn btn-danger text-white">确认</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+
+        $('#confirm-invite-code-modal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var invite_code = button.data('code');
+            var action = button.data('action');
+            var action_href = button.data('href');
+            if (action == "reopen") {
+                $("#confirm-invite-code-modal-content").text("是否重用邀请码：" + invite_code);
+            } else if (action == "delete") {
+                $("#confirm-invite-code-modal-content").text("是否删除邀请码：" + invite_code);
+            }
+            $("#confirm-invite-btn").attr("href", action_href);
+        });
+    </script>
 {% endblock content %}

@@ -12,6 +12,12 @@ SECRET_KEY = os.environ.get('V2RAYUI_SECRET_KEY', '&%up9@!s_$$4(qurnori=vit2#kg!
 # 新用户默认等级
 DEFAULT_LEVEL = 1
 
+# 新用户默认过期天数（即试用时间）
+DEFAULT_USER_EXPIRE_DAYS = 3
+
+# 是否允许普通用户创建邀请码
+ENABLE_USER_INVITATION = False
+
 # 默认每个用户可生成的邀请码数量
 INVITE_CODE_NUM = 5
 
@@ -25,18 +31,18 @@ DEFAULT_TRAFFIC = 0
 CLIENTS = {
     "windows": {
         "client_name": "v2rayN",
-        "version": "v1",
-        "file_name": "v2rayN.zip"
+        "version": "3.4",
+        "file_name": "v2rayN_3.4.zip"
     },
     "android": {
         "client_name": "v2rayNG",
-        "version": "v1",
-        "file_name": "v2rayNG.apk"
+        "version": "1.1.15",
+        "file_name": "v2rayNG_1.1.15.apk"
     },
     "macos": {
-        "client_name": "v2rayU",
-        "version": "v1",
-        "file_name": "v2rayX.dmg"
+        "client_name": "V2rayU",
+        "version": "1.5.1",
+        "file_name": "V2rayU_1.5.1.dmg"
     },
     "ios": {
         "client_name": "Shadowrocket",
@@ -48,11 +54,6 @@ CLIENTS = {
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('V2RAYUI_DEBUG', True)
 
-# 定时任务
-CRONJOBS = [
-    ('*/1 * * * *', 'v2rayui.cornjobs.demo')
-]
-
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -62,7 +63,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_crontab',
     'v2rayui.apps.V2RayuiConfig',
 ]
 
@@ -92,6 +92,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'v2rayui.views.global_settings'
             ],
         },
     },

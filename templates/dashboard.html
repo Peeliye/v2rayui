@@ -1,12 +1,11 @@
 {% extends 'uibase.html' %}
 {% block title %}首页{% endblock title %}
 
-{% load v2rayui_filter %}
-{% load static %}
+{% load v2rayui_filter %}{% load static %}
 
 {% block js %}
     {{ block.super }}
-    <script src="{% static 'js/jquery.qrcode.min.js' %}"></script>
+    <script src="{% static 'js/qrcode.min.js' %}"></script>
 {% endblock js %}
 
 {% block content %}
@@ -18,7 +17,7 @@
                         <span class="info-box-icon bg-info"><i class="fas fa-chart-pie"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">当月已用流量</span>
-                            <span class="info-box-number">0GB</span>
+                            <span class="info-box-number">{{ traffic }} GB</span>
                         </div>
                     </div>
                 </div>
@@ -86,73 +85,35 @@
                                         </p>
                                     </li>
                                     <li class="nav-item">
-                                        <p class="text-muted mt-3 mb-3"><b class="text-sm mr-2">传输协议: </b><span class="badge badge-success">ws</span>
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">传输协议: </b><span class="badge badge-success">{{ node.protocol }}</span>
                                         </p>
                                     </li>
                                     <li class="nav-item">
-                                        <p class="text-muted mt-3 mb-3"><b class="text-sm mr-2">路径: </b><span class="badge badge-success">/abc</span>
+                                        <p class="text-muted mt-3 mb-3">
+                                            <b class="text-sm mr-2">路径: </b><span class="badge badge-success">{{ node.path }}</span>
                                         </p>
                                     </li>
                                     <li class="nav-item">
                                         <p class="text-muted mt-3 mb-3"><b class="text-sm mr-2">TLS: </b><span class="badge badge-success">开启</span>
                                         </p>
                                     </li>
+                                    <li class="nav-item d-none">
+                                        <span class="v2rayui-vmess-link">{{ node | get_vmess_link:request }}</span>
+                                    </li>
+                                    <li class="nav-item d-none">
+                                        <span class="v2rayui-vmess-ios-link">{{ node | get_ios_vmess_link:request }}</span>
+                                    </li>
                                 </ul>
                             </div>
                             <div class="card-footer">
                                 <div class="text-right">
-                                    <button type="button" class="btn btn-sm btn-primary mr-2" data-toggle="modal" data-target="#link-modal-{{ forloop.counter }}">
-                                        <i class="fas fa-link"></i> 账号链接
+                                    <button type="button" class="btn btn-sm btn-primary mr-2 common-vmess-info-btn" data-toggle="modal" data-target="#vmess-info-modal">
+                                        <i class="fas fa-info"></i> 普通账号
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#qrcode-modal-{{ forloop.counter }}">
-                                        <i class="fas fa-qrcode"></i> 二维码
+                                    <button type="button" class="btn btn-sm btn-warning ios-vmess-info-btn" data-toggle="modal" data-target="#vmess-info-modal">
+                                        <i class="fab fa-apple"></i> iOS专用账号
                                     </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Modal -->
-                    <div class="modal fade" id="link-modal-{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="link-modal-center-title-{{ forloop.counter }}" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="link-modal-center-title-{{ forloop.counter }}">账号链接</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <textarea class="form-control" rows="9" readonly>vmess://{{ node | get_vmss_base64:request }}</textarea>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal fade" id="qrcode-modal-{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="qrcode-modal-center-title-{{ forloop.counter }}" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="qrcode-modal-center-title-{{ forloop.counter }}">账号二维码</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <div id="qrcode-picture-{{ forloop.counter }}" class="mx-auto d-block text-center"></div>
-                                    <script>
-                                        $('#qrcode-picture-{{ forloop.counter }}').qrcode({
-                                            width: 300,
-                                            height: 300,
-                                            text: "vmess://{{ node | get_vmss_base64:request }}"
-                                        });
-                                    </script>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
                                 </div>
                             </div>
                         </div>
@@ -161,4 +122,81 @@
             </div>
         </div>
     </section>
+
+    <!-- Modal -->
+    <div class="modal fade" id="vmess-info-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body p-0">
+                    <div class="card-primary card-outline card-tabs">
+                        <div class="card-header p-0 pt-1 pl-1 border-bottom-0">
+                            <ul class="nav nav-tabs" id="vmess-tabs-tab" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="vmess-tabs-link-tab" data-toggle="pill" href="#vmess-tabs-link" role="tab" aria-controls="vmess-tabs-link" aria-selected="true">账号链接</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="vmess-tabs-qrcode-tab" data-toggle="pill" href="#vmess-tabs-qrcode" role="tab" aria-controls="vmess-tabs-qrcode" aria-selected="false">账号二维码</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content" id="vmess-tabs-tabContent">
+                                <div class="tab-pane fade show active" id="vmess-tabs-link" role="tabpanel" aria-labelledby="vmess-tabs-link-tab">
+                                    <textarea id="vmess-link-textarea" class="form-control" rows="9" readonly></textarea>
+                                </div>
+                                <div class="tab-pane fade" id="vmess-tabs-qrcode" role="tabpanel" aria-labelledby="vmess-tabs-qrcode-tab">
+                                    <div id="vmess-qrcode-picture" class="text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var qrcode = new QRCode(document.getElementById("vmess-qrcode-picture"), {
+            text: "vmess://",
+            width: 300,
+            height: 300,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+        });
+
+        function reset_tabs_active() {
+            $("#vmess-tabs-qrcode-tab").removeClass("active");
+            $("#vmess-tabs-qrcode").removeClass("show active");
+            $("#vmess-tabs-link").addClass("show active");
+            $("#vmess-tabs-link-tab").addClass("active");
+        }
+
+        $(".common-vmess-info-btn").click(function () {
+            var card_body = $(this).closest(".card").children(".card-body");
+            var vmess_link = card_body.find(".v2rayui-vmess-link").text();
+            $("#vmess-tabs-link-tab").text("普通账号链接");
+            $("#vmess-tabs-qrcode-tab").text("普通账号二维码");
+            $("#vmess-link-textarea").val(vmess_link);
+            qrcode.clear();
+            qrcode.makeCode(vmess_link);
+            $("#vmess-qrcode-picture").find("img").addClass("rounded mx-auto d-block");
+            reset_tabs_active();
+        });
+
+        $(".ios-vmess-info-btn").click(function () {
+            var card_body = $(this).closest(".card").children(".card-body");
+            var vmess_ios_link = card_body.find(".v2rayui-vmess-ios-link").text();
+            $("#vmess-tabs-link-tab").text("iOS专用账号链接");
+            $("#vmess-tabs-qrcode-tab").text("iOS专用账号二维码");
+            $("#vmess-link-textarea").val(vmess_ios_link);
+            qrcode.clear();
+            qrcode.makeCode(vmess_ios_link);
+            $("#vmess-qrcode-picture").find("img").addClass("rounded mx-auto d-block");
+            reset_tabs_active();
+        });
+    </script>
 {% endblock content %}
